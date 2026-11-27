@@ -22,6 +22,36 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.iml
+
+# Flutter & Dart files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+.metadata
+build/
+lib/
+test/
+pubspec.lock
+pubspec.yaml
+analysis_options.yaml
+
+# Android platform files
+android/
+.gradle/
+local.properties
+*.apk
+*.aab
+
+# iOS & Desktop platform targets from Flutter
+ios/
+linux/
+macos/
+windows/
+web/
 
 # Graphify & Agents (Local only)
 graphify-out/

@@ -29,12 +29,21 @@ export const Timeline: React.FC<TimelineProps> = ({
   onMilestoneClick,
   className = '',
 }) => {
+  // Only reveal the timeline once the user scrolls beyond the Hero section (Scene 1)
+  const timelineOpacity = Math.min(Math.max((scrollProgress - 0.13) / 0.08, 0), 1);
+  const isVisible = timelineOpacity > 0.05;
+
   return (
     <>
       {/* --- DESKTOP FIXED VERTICAL TIMELINE --- */}
       <div
-        className={`hidden lg:flex fixed right-8 xl:right-14 top-1/2 -translate-y-1/2 z-40 flex-col items-start select-none ${className}`}
-        style={{ width: '180px' }}
+        className={`hidden lg:flex fixed right-8 xl:right-14 top-1/2 -translate-y-1/2 z-40 flex-col items-start select-none transition-all duration-300 ${className}`}
+        style={{ 
+          width: '180px',
+          opacity: timelineOpacity,
+          pointerEvents: isVisible ? 'auto' : 'none',
+          transform: `translateY(calc(-50% + ${(1 - timelineOpacity) * 20}px))`,
+        }}
       >
         <div className="relative py-4 pl-3">
           {/* Vertical Connecting Hairline Line */}
@@ -95,8 +104,15 @@ export const Timeline: React.FC<TimelineProps> = ({
       </div>
 
       {/* --- MOBILE COMPACT BOTTOM PROGRESS INDICATOR --- */}
-      <div className="lg:hidden fixed bottom-4 inset-x-4 z-40 flex justify-center pointer-events-none">
-        <div className="pointer-events-auto bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 flex items-center space-x-3 shadow-sm border border-slate-200">
+      <div 
+        className="lg:hidden fixed bottom-4 inset-x-4 z-40 flex justify-center pointer-events-none transition-all duration-300"
+        style={{
+          opacity: timelineOpacity,
+          pointerEvents: isVisible ? 'auto' : 'none',
+          transform: `translateY(${(1 - timelineOpacity) * 16}px)`,
+        }}
+      >
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 flex items-center space-x-3 shadow-sm border border-slate-200">
           <span className="text-xs font-medium text-[#193653] whitespace-nowrap">
             Phase {activeIndex + 1} of 5: {MILESTONES[activeIndex]?.label}
           </span>

@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
 import { ArrowRight, Play, ChevronDown, Zap, Moon, Smile, Calendar, FileText, Activity } from 'lucide-react';
-import { DermoraCellMascot } from '../characters/DermoraCellMascot';
+import { HeroImageIllustration } from '../hero/HeroImageIllustration';
 import { MascotPeaceful } from '../characters/MascotPeaceful';
 import { SkinCellCreature } from '../characters/SkinCellCreature';
 import { DoctorIllustration } from '../characters/DoctorIllustration';
@@ -80,8 +80,9 @@ export const ScrollExperience: React.FC<ScrollExperienceProps> = ({
   // Scene 1 (0.00 to 0.20)
   const scene1Opacity = 1 - range(scrollProgress, 0.14, 0.21);
   const scene1TranslateY = range(scrollProgress, 0.12, 0.21) * -20;
-  const mascotShiftX = range(scrollProgress, 0.13, 0.24) * -110;
-  const mascotOpacity = 1 - range(scrollProgress, 0.15, 0.24);
+  const heroConsoleOpacity = 1 - range(scrollProgress, 0.13, 0.22);
+  const heroConsoleTranslateY = range(scrollProgress, 0.10, 0.22) * -35;
+  const heroConsoleScale = 1 - range(scrollProgress, 0.10, 0.22) * 0.05;
 
   // Scene 2 (0.17 to 0.41)
   const scene2Opacity = range(scrollProgress, 0.15, 0.20) * (1 - range(scrollProgress, 0.35, 0.41));
@@ -301,23 +302,24 @@ export const ScrollExperience: React.FC<ScrollExperienceProps> = ({
             {/* COLUMN 2: DEDICATED ILLUSTRATION STAGE */}
             <div className="lg:col-span-7 relative min-h-[440px] flex items-center justify-center overflow-visible">
 
-              {/* 1. DERMORA LIVING CELL MASCOT */}
+              {/* 1. HERO IMAGE ILLUSTRATION */}
               <div
-                className="absolute z-20 transition-all duration-200"
+                className="absolute z-30 w-full flex justify-center lg:justify-end transition-all duration-200"
                 style={{
-                  opacity: mascotOpacity,
-                  transform: `translateX(${mascotShiftX}px)`,
-                  pointerEvents: mascotOpacity > 0.2 ? 'auto' : 'none',
+                  opacity: heroConsoleOpacity,
+                  transform: `translateY(${heroConsoleTranslateY}px) scale(${heroConsoleScale})`,
+                  pointerEvents: heroConsoleOpacity > 0.2 ? 'auto' : 'none',
                 }}
               >
-                <DermoraCellMascot size={270} interactive={true} />
+                <HeroImageIllustration onExplore={onStartJourney} />
               </div>
 
               {/* 2. THE SKIN CELL CHARACTERS */}
               <div
-                className="relative z-25 flex items-center justify-center"
+                className="relative z-20 flex items-center justify-center transition-opacity duration-200"
                 style={{
-                  opacity: 1 - phoneEnter * 0.9,
+                  opacity: range(scrollProgress, 0.12, 0.20) * (1 - phoneEnter * 0.9),
+                  pointerEvents: scrollProgress > 0.16 ? 'auto' : 'none',
                 }}
               >
                 {/* Flank 1 (Left) */}

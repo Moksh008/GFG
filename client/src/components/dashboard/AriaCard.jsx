@@ -50,7 +50,7 @@ export function AriaCard({ scanCount, onExportReport, onOpenScan }) {
   };
 
   return (
-    <div className="h-[340px] rounded-[14px] p-4 text-[#1F2A2E] flex flex-col justify-between relative overflow-hidden border border-[#A9C1CC] shadow-md bg-[#C8E5E4]">
+    <div className="h-[360px] lg:h-[340px] rounded-[14px] p-4 text-[#1F2A2E] flex flex-col justify-between relative overflow-hidden border border-[#A9C1CC] shadow-md bg-[#C8E5E4]">
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
         <img
           src="/flower.jpg"

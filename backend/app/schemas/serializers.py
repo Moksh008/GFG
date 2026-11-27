@@ -1,12 +1,15 @@
 """Entity -> JSON shapes consumed by the React dashboard (mirrors src/data/mockData.js)."""
 from __future__ import annotations
 
+from datetime import datetime
+
 from app.entities import (
     Appointment, CareStep, ChatMessage, Doctor, ImprovementRecord, Medicine, MoodLog, SkinDiagnosis, User,
     VoiceMessage, VoiceSession,
 )
 from app.services import skin_knowledge
 from app.services.lesion_analysis import symmetry_label
+from app.services.scheduling import clinic_times, parse_slot
 from app.utils.timefmt import aware, display_date, relative_time
 
 
@@ -133,7 +136,9 @@ def care_step_out(s: CareStep) -> dict:
     }
 
 
-def doctor_out(d: Doctor) -> dict:
+def doctor_out(d: Doctor, slots: list[str] | None = None) -> dict:
+    """``slots`` are concrete open booking slots (see services.scheduling)."""
+    slots = slots or []
     return {
         "id": d.id,
         "name": d.name,
@@ -146,16 +151,22 @@ def doctor_out(d: Doctor) -> dict:
         "reviews": d.reviews,
         "status": d.status,
         "avatar": d.avatar,
-        "slots": d.slots or [],
+        "clinicTimes": clinic_times(d),
+        "slots": slots,
+        "nextAvailable": slots[0] if slots else None,
     }
 
 
 def appointment_out(a: Appointment) -> dict:
+    starts = parse_slot(a.slot)
     return {
         "id": a.id,
         "doctorId": a.doctor_id,
         "doctor": a.doctor_name,
         "date": a.slot,
+        # Local wall-clock ISO start time when the slot is a structured booking (else None).
+        "startsAt": a.slot if starts else None,
+        "upcoming": a.status == "confirmed" and (starts is None or starts >= datetime.now()),
         "department": a.department,
         "type": a.type,
         "reportAttached": a.report_attached,

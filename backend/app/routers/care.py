@@ -1,6 +1,8 @@
 """Medications, care plan, providers and appointments for the dashboard."""
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from datetime import datetime, timedelta
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import delete as sa_delete, select
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -9,7 +11,8 @@ from app.entities import Appointment, CareStep, Doctor, DoseLog, Medicine, User
 from app.schemas.requests import AppointmentIn, CareStepIn, CareStepUpdate, DoseIn, MedicineIn, MedicineUpdate
 from app.schemas.serializers import appointment_out, care_step_out, doctor_out, medicine_out
 from app.services.patient_context import adherence, doses_today
-from app.utils.timefmt import today_utc
+from app.services.scheduling import booked_slots, open_slots, parse_slot
+from app.utils.timefmt import aware, today_utc
 
 router = APIRouter(tags=["care"])
 
@@ -68,8 +71,35 @@ def update_medicine(med_id: int, body: MedicineUpdate, user: User = Depends(get_
 
 @router.delete("/medicines/{med_id}", status_code=204)
 def delete_medicine(med_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    db.delete(_owned_med(db, user, med_id))
+    med = _owned_med(db, user, med_id)
+    # SQLite doesn't enforce ON DELETE CASCADE, and a reused id would inherit orphaned logs.
+    db.execute(sa_delete(DoseLog).where(DoseLog.medicine_id == med.id))
+    db.delete(med)
     db.commit()
+
+
+@router.get("/medicines/history", summary="Per-day dose adherence for the last N days (oldest first)")
+def medicine_history(days: int = Query(14, ge=1, le=90), user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    meds = list(db.scalars(select(Medicine).where(Medicine.user_id == user.id, Medicine.active.is_(True)).order_by(Medicine.id)))
+    today = today_utc()
+    start = today - timedelta(days=days - 1)
+    logs = db.scalars(select(DoseLog).where(DoseLog.medicine_id.in_([m.id for m in meds]), DoseLog.day >= start)) if meds else []
+    taken = {(l.medicine_id, l.day): l.doses_taken for l in logs}
+    out = []
+    for i in range(days):
+        day = start + timedelta(days=i)
+        # A medicine only counts from the day it was added.
+        active = [m for m in meds if aware(m.created_at).date() <= day]
+        expected = sum(m.doses_per_day for m in active)
+        done = sum(min(taken.get((m.id, day), 0), m.doses_per_day) for m in active)
+        out.append({
+            "date": day.isoformat(),
+            "expected": expected,
+            "taken": done,
+            "pct": round(100 * done / expected, 1) if expected else None,
+            "perMedicine": {str(m.id): min(taken.get((m.id, day), 0), m.doses_per_day) for m in active},
+        })
+    return {"days": out, "medicines": [{"id": m.id, "name": m.name, "totalDoses": m.doses_per_day} for m in meds]}
 
 
 @router.post("/medicines/{med_id}/toggle", summary="Toggle today's doses between all-taken and none")
@@ -130,13 +160,23 @@ def delete_step(step_id: int, user: User = Depends(get_current_user), db: Sessio
 
 # ================================================================ doctors & appointments
 @router.get("/doctors")
-def list_doctors(_: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return [doctor_out(d) for d in db.scalars(select(Doctor).order_by(Doctor.id))]
+def list_doctors(
+    specialty: str | None = Query(None, description="Case-insensitive match on department or specialty"),
+    _: User = Depends(get_current_user), db: Session = Depends(get_db),
+):
+    docs = list(db.scalars(select(Doctor).order_by(Doctor.id)))
+    if specialty:
+        q = specialty.strip().lower()
+        docs = [d for d in docs if q in d.department.lower() or q in d.specialty.lower()]
+    booked = booked_slots(db, [d.id for d in docs])
+    return [doctor_out(d, open_slots(d, booked.get(d.id))) for d in docs]
 
 
 @router.get("/appointments")
 def list_appointments(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    apts = db.scalars(select(Appointment).where(Appointment.user_id == user.id).order_by(Appointment.created_at.desc(), Appointment.id.desc()))
+    apts = list(db.scalars(select(Appointment).where(Appointment.user_id == user.id)))
+    # Structured slots sort chronologically; legacy free-text slots go last.
+    apts.sort(key=lambda a: (parse_slot(a.slot) is None, parse_slot(a.slot) or datetime.max, -a.id))
     return [appointment_out(a) for a in apts]
 
 
@@ -147,15 +187,15 @@ def book(body: AppointmentIn, user: User = Depends(get_current_user), db: Sessio
         raise HTTPException(status_code=404, detail="Doctor not found")
     if doc.status != "Available":
         raise HTTPException(status_code=409, detail=f"{doc.name} is not currently accepting bookings")
-    if body.slot not in (doc.slots or []):
-        raise HTTPException(status_code=409, detail="That slot is no longer available")
     clash = db.scalars(select(Appointment).where(
         Appointment.doctor_id == doc.id, Appointment.slot == body.slot, Appointment.status == "confirmed"
     )).first()
     if clash:
         raise HTTPException(status_code=409, detail="That slot has just been booked")
+    if body.slot not in open_slots(doc):
+        raise HTTPException(status_code=409, detail="That slot is no longer available")
     a = Appointment(user_id=user.id, doctor_id=doc.id, doctor_name=doc.name, slot=body.slot, department=doc.department,
-                    type=body.type, report_attached=body.report_attached, notes=body.notes)
+                    type=body.type, report_attached=body.report_attached, notes=body.notes.strip())
     db.add(a)
     db.commit()
     return appointment_out(a)

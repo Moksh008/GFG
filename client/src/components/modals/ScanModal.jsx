@@ -7,7 +7,7 @@ import { ScanResult } from '../scans/ScanResult';
 import { QuestionnaireForm } from '../scans/QuestionnaireForm';
 import { ConsultationCard } from '../scans/ConsultationCard';
 
-const DEFAULT_AREA = 'Right Forearm (Epithelial)';
+const AREA_SUGGESTIONS = ['Left Forearm', 'Right Forearm', 'Face', 'Neck', 'Scalp', 'Back', 'Left Hand', 'Right Hand', 'Left Leg', 'Right Leg'];
 const SUBTITLES = {
   capture: 'DINOv2 ViT-B/14 analysis · eczema, psoriasis, vitiligo',
   result: 'Review the AI analysis before saving',
@@ -19,11 +19,11 @@ const SUBTITLES = {
  * Capture -> AI result -> (save) -> follow-up questionnaire -> consultation.
  * /skin/detect persists immediately; discarding at the result step deletes it again.
  */
-export default function ScanModal({ isOpen, onClose, onSaved, defaultBodyArea }) {
+export default function ScanModal({ isOpen, onClose, onSaved, defaultBodyArea, knownAreas = [] }) {
   const [step, setStep] = useState('capture');
   // null = not edited yet, so the field follows the most recently scanned area.
   const [editedArea, setEditedArea] = useState(null);
-  const bodyArea = editedArea ?? defaultBodyArea ?? DEFAULT_AREA;
+  const bodyArea = editedArea ?? defaultBodyArea ?? '';
   const setBodyArea = setEditedArea;
   const [notes, setNotes] = useState('');
   const [file, setFile] = useState(null);
@@ -67,10 +67,11 @@ export default function ScanModal({ isOpen, onClose, onSaved, defaultBodyArea })
 
   const analyse = async () => {
     if (!file) return setError('Please take or upload a photo of the affected area first.');
+    if (!bodyArea.trim()) return setError('Name the body area so future scans of it can be compared.');
     setBusy(true);
     setError(null);
     try {
-      setScan(await skinApi.detect({ file, bodyArea: bodyArea.trim() || 'Unspecified', notes: notes.trim() }));
+      setScan(await skinApi.detect({ file, bodyArea: bodyArea.trim(), notes: notes.trim() }));
       setStep('result');
     } catch (err) {
       setError(err.message);
@@ -124,7 +125,34 @@ export default function ScanModal({ isOpen, onClose, onSaved, defaultBodyArea })
               <MapPin className="w-3.5 h-3.5 text-[#3F5F4A]" /> Body area
             </label>
             <input id="scan-area" className={inputClass} value={bodyArea} onChange={(e) => setBodyArea(e.target.value)} placeholder="e.g. Left Forearm" />
-            <p className="text-[10px] text-[#8A9AA0] mt-1">Use the same name each time so progress can be compared.</p>
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {knownAreas.map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() => setBodyArea(a)}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border cursor-pointer ${
+                    bodyArea === a ? 'bg-[#0F3B3F] text-white border-[#0F3B3F]' : 'bg-[#DCEBE8]/60 text-[#0F3B3F] border-[#A9C1CC]'
+                  }`}
+                  title="Previously scanned — progress will be compared"
+                >
+                  ↻ {a}
+                </button>
+              ))}
+              {AREA_SUGGESTIONS.filter((a) => !knownAreas.some((k) => k.toLowerCase() === a.toLowerCase())).map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() => setBodyArea(a)}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-medium border cursor-pointer ${
+                    bodyArea === a ? 'bg-[#0F3B3F] text-white border-[#0F3B3F]' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-[#8A9AA0] mt-1">Use the same name each time so the change in size and redness can be measured.</p>
           </div>
 
           <div>

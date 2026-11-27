@@ -81,12 +81,12 @@ export function AppHeader({ title, subtitle, aside }) {
           <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center text-[#0F3B3F]">
             <Plus className="w-4 h-4 stroke-[3]" />
           </div>
-          <span className="text-white text-base font-semibold tracking-tight hidden sm:inline">
+          <span className="text-white text-base font-semibold tracking-tight">
             Dermora<span className="font-normal opacity-90">.ai</span>
           </span>
         </Link>
 
-        <nav className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar">
+        <nav className="hidden md:flex items-center gap-2" aria-label="Main">
           {NAV.map((item) => (
             <NavItem key={item.to} {...item} />
           ))}
@@ -95,9 +95,36 @@ export function AppHeader({ title, subtitle, aside }) {
         <UserMenu />
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-end justify-between mt-5 gap-3">
+      {/* Phones: fixed bottom tab bar */}
+      <nav
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 flex justify-around pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] print:hidden"
+        aria-label="Main"
+      >
+        {NAV.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl text-[10px] font-semibold transition ${
+                isActive ? 'text-[#0F3B3F]' : 'text-[#8A9AA0]'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <span className={`w-9 h-7 rounded-full flex items-center justify-center ${isActive ? 'bg-[#DCEBE8]' : ''}`}>
+                  <Icon className="w-4 h-4" />
+                </span>
+                {label}
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="flex flex-col md:flex-row md:items-end justify-between mt-4 sm:mt-5 gap-3">
         <div>
-          <h1 className="text-[28px] font-light text-white tracking-tight leading-none drop-shadow-xs">{title}</h1>
+          <h1 className="text-[24px] sm:text-[28px] font-light text-white tracking-tight leading-none drop-shadow-xs">{title}</h1>
           {subtitle && <p className="text-xs text-white/90 mt-1 font-medium">{subtitle}</p>}
         </div>
         {aside}

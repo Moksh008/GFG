@@ -28,6 +28,14 @@ google-genai>=1.20
 httpx>=0.27
 fpdf2>=2.7
 
+# Blockchain report verification
+web3>=7
+eth-tester>=0.12          # in-process dev chain (WEB3_RPC_URL=local) + tests
+py-evm>=0.10
+eth-hash[pycryptodome]>=0.7
+qrcode[pil]>=7.4
+py-solc-x>=2.0            # only for scripts/compile_contract.py
+
 # Optional: iPhone HEIC photos
 # pillow-heif>=0.16
 

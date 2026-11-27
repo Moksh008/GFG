@@ -15,7 +15,7 @@ export function SuggestedStepsCard({ careSteps, onOpenPlanModal, onToggleStep })
   const ordered = [...careSteps].sort((a, b) => Number(a.completed) - Number(b.completed));
 
   return (
-    <div className="solid-card h-[340px] flex flex-col justify-between">
+    <div className="solid-card min-h-[300px] lg:h-[340px] flex flex-col justify-between">
       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
         <div>
           <h3 className="text-sm font-semibold tracking-tight text-[#1F2A2E]">Suggested Next Steps</h3>

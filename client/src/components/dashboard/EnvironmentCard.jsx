@@ -24,7 +24,7 @@ export function EnvironmentCard() {
   const { status, data, error, locate } = useWeather();
 
   return (
-    <div className="solid-card h-[300px] flex flex-col">
+    <div className="solid-card min-h-[280px] lg:h-[300px] flex flex-col">
       <div className="flex items-start justify-between pb-2 border-b border-slate-100">
         <div>
           <h3 className="text-sm font-semibold tracking-tight text-[#1F2A2E]">Environment</h3>

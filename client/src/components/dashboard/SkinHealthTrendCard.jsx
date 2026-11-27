@@ -30,7 +30,7 @@ export function SkinHealthTrendCard({ scans, onOpenScanModal }) {
   const health = latest ? 100 - latest.severityScore : null;
 
   return (
-    <div className="solid-card h-[340px] flex flex-col justify-between">
+    <div className="solid-card min-h-[300px] lg:h-[360px] flex flex-col justify-between">
       <div>
         <div className="flex items-start justify-between">
           <div>

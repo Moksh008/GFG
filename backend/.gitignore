@@ -1,0 +1,12 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+dermora.db
+dermora.db-*
+test_*.db
+uploads/
+convo_audios/
+app/models/weights/*.pth

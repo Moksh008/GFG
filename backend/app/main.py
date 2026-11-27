@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Dermora.ai API",
-    version="1.0.0",
+    version="0.1.0",
     description="Because your skin feels what you feel. Skin-condition detection, mood tracking, "
     "Solace voice therapy, progress analytics and environmental intelligence.",
     lifespan=lifespan,

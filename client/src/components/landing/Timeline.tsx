@@ -9,11 +9,11 @@ export interface Milestone {
 }
 
 export const MILESTONES: Milestone[] = [
-  { id: 'starts-small', number: 1, label: 'It Starts Small', targetId: 'hero' },
-  { id: 'multiplies', number: 2, label: 'It Multiplies', targetId: 'multiplies' },
-  { id: 'takes-toll', number: 3, label: 'It Takes a Toll', targetId: 'takes-toll' },
-  { id: 'scan-analyse', number: 4, label: 'Scan & Analyse', targetId: 'scan-analyse' },
-  { id: 'review-doctor', number: 5, label: 'Review with a Doctor', targetId: 'review-doctor' },
+  { id: 'starts-small', number: 1, label: 'Early indicators', targetId: 'hero' },
+  { id: 'multiplies', number: 2, label: 'Barrier progression', targetId: 'multiplies' },
+  { id: 'takes-toll', number: 3, label: 'Systemic factors', targetId: 'takes-toll' },
+  { id: 'scan-analyse', number: 4, label: 'Vision scan', targetId: 'scan-analyse' },
+  { id: 'review-doctor', number: 5, label: 'Clinical review', targetId: 'review-doctor' },
 ];
 
 interface TimelineProps {
@@ -37,11 +37,11 @@ export const Timeline: React.FC<TimelineProps> = ({
         style={{ width: '180px' }}
       >
         <div className="relative py-4 pl-3">
-          {/* Vertical Connecting Line */}
-          <div className="absolute left-[23px] top-6 bottom-6 w-[2px]">
-            <div className="absolute inset-0 bg-[#DCEAF5] rounded-full" />
+          {/* Vertical Connecting Hairline Line */}
+          <div className="absolute left-[20px] top-6 bottom-6 w-[1.5px]">
+            <div className="absolute inset-0 bg-slate-200" />
             <motion.div
-              className="absolute top-0 left-0 w-full bg-gradient-to-b from-[#193653] via-[#3B82F6] to-[#0D9488] rounded-full transition-all duration-200"
+              className="absolute top-0 left-0 w-full bg-[#193653] transition-all duration-150"
               style={{
                 height: `${Math.min(Math.max(scrollProgress * 100, 4), 100)}%`,
               }}
@@ -49,7 +49,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           </div>
 
           {/* Milestone Nodes */}
-          <div className="flex flex-col space-y-11 relative z-10">
+          <div className="flex flex-col space-y-10 relative z-10">
             {MILESTONES.map((milestone, idx) => {
               const isActive = activeIndex === idx;
               const isPassed = activeIndex >= idx;
@@ -58,37 +58,31 @@ export const Timeline: React.FC<TimelineProps> = ({
                 <button
                   key={milestone.id}
                   onClick={() => onMilestoneClick(idx, milestone.targetId)}
-                  className="group flex items-center space-x-3.5 focus:outline-none text-left cursor-pointer transition-all"
+                  className="group flex items-center space-x-3.5 focus:outline-none text-left cursor-pointer transition-colors"
                 >
                   {/* Node Circle */}
                   <div
-                    className={`relative w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    className={`relative w-4 h-4 rounded-full flex items-center justify-center transition-all duration-200 ${
                       isActive
-                        ? 'bg-[#193653] scale-125 ring-4 ring-[#B8D0E4]/60 shadow-[0_0_14px_rgba(25,54,83,0.35)]'
+                        ? 'bg-[#193653] ring-2 ring-slate-300'
                         : isPassed
-                        ? 'bg-[#3B82F6] ring-2 ring-white shadow-xs'
-                        : 'bg-white border-2 border-[#B8D0E4] hover:border-[#193653]'
+                        ? 'bg-[#193653]'
+                        : 'bg-white border border-slate-300 group-hover:border-[#193653]'
                     }`}
                   >
-                    <div
-                      className={`w-2 h-2 rounded-full transition-colors ${
-                        isActive
-                          ? 'bg-teal-300 animate-pulse'
-                          : isPassed
-                          ? 'bg-white'
-                          : 'bg-transparent'
-                      }`}
-                    />
+                    {isActive && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                    )}
                   </div>
 
                   {/* Label Text */}
                   <span
-                    className={`text-xs tracking-tight transition-all duration-300 whitespace-nowrap ${
+                    className={`text-xs transition-colors duration-150 whitespace-nowrap ${
                       isActive
-                        ? 'font-bold text-[#193653] translate-x-1'
+                        ? 'font-medium text-[#193653]'
                         : isPassed
-                        ? 'font-medium text-[#193653]/80'
-                        : 'font-normal text-[#193653]/45 group-hover:text-[#193653]/80'
+                        ? 'font-normal text-[#193653]/80'
+                        : 'font-normal text-[#193653]/50 group-hover:text-[#193653]/80'
                     }`}
                   >
                     {milestone.label}
@@ -100,11 +94,11 @@ export const Timeline: React.FC<TimelineProps> = ({
         </div>
       </div>
 
-      {/* --- MOBILE COMPACT BOTTOM PROGRESS PILL --- */}
+      {/* --- MOBILE COMPACT BOTTOM PROGRESS INDICATOR --- */}
       <div className="lg:hidden fixed bottom-4 inset-x-4 z-40 flex justify-center pointer-events-none">
-        <div className="pointer-events-auto clay-pill rounded-full px-4 py-2 flex items-center space-x-3 shadow-xl border border-white">
-          <span className="text-[11px] font-bold text-[#193653] whitespace-nowrap">
-            Step {activeIndex + 1}/5: {MILESTONES[activeIndex]?.label}
+        <div className="pointer-events-auto bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 flex items-center space-x-3 shadow-sm border border-slate-200">
+          <span className="text-xs font-medium text-[#193653] whitespace-nowrap">
+            Phase {activeIndex + 1} of 5: {MILESTONES[activeIndex]?.label}
           </span>
           <div className="flex items-center space-x-1.5">
             {MILESTONES.map((m, idx) => (
@@ -112,12 +106,12 @@ export const Timeline: React.FC<TimelineProps> = ({
                 key={m.id}
                 onClick={() => onMilestoneClick(idx, m.targetId)}
                 aria-label={`Go to ${m.label}`}
-                className={`w-2 h-2 rounded-full transition-all ${
+                className={`h-1.5 rounded-sm transition-all ${
                   activeIndex === idx
                     ? 'w-4 bg-[#193653]'
                     : activeIndex > idx
-                    ? 'bg-[#3B82F6]'
-                    : 'bg-[#B8D0E4]'
+                    ? 'w-1.5 bg-[#193653]'
+                    : 'w-1.5 bg-slate-200'
                 }`}
               />
             ))}

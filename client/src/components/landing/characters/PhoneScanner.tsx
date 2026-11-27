@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Scan, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Scan, CheckCircle2, Focus } from 'lucide-react';
 import { SkinCreature } from './SkinCreature';
 
 interface PhoneScannerProps {
@@ -37,11 +37,11 @@ export const PhoneScanner: React.FC<PhoneScannerProps> = ({
         setScanStatus('Synthesizing risk insights...');
       } else if (progress >= 100) {
         clearInterval(interval);
-        setScanStatus('Analysis Complete!');
+        setScanStatus('Analysis complete');
         setIsScanning(false);
         setScanFinished(true);
         if (onScanComplete) {
-          setTimeout(() => onScanComplete(), 600);
+          setTimeout(() => onScanComplete(), 500);
         }
       }
     }, 90);
@@ -54,7 +54,7 @@ export const PhoneScanner: React.FC<PhoneScannerProps> = ({
         className="relative"
         animate={{
           rotate: [9, 11, 9],
-          y: [0, -6, 0],
+          y: [0, -4, 0],
         }}
         transition={{
           duration: 5,
@@ -63,11 +63,11 @@ export const PhoneScanner: React.FC<PhoneScannerProps> = ({
         }}
         style={{ transformOrigin: 'center center' }}
       >
-        {/* Soft 3D Shadow under Phone */}
+        {/* Soft Neutral Shadow under Phone */}
         <div
-          className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-80 h-16 rounded-full blur-2xl opacity-40 pointer-events-none"
+          className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-80 h-16 rounded-full blur-xl opacity-20 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(25, 54, 83, 0.45) 0%, rgba(184, 208, 228, 0) 70%)',
+            background: 'radial-gradient(ellipse at center, rgba(25, 54, 83, 0.3) 0%, rgba(25, 54, 83, 0) 70%)',
           }}
         />
 
@@ -113,43 +113,34 @@ export const PhoneScanner: React.FC<PhoneScannerProps> = ({
 
         {/* --- SMARTPHONE CHASSIS --- */}
         <div
-          className="relative w-[310px] h-[480px] rounded-[42px] p-3 shadow-2xl z-10"
-          style={{
-            background: 'linear-gradient(145deg, #2D3A4B 0%, #152232 50%, #0F1722 100%)',
-            boxShadow: '0 25px 60px -15px rgba(25, 54, 83, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
-          }}
+          className="relative w-[310px] h-[480px] rounded-[36px] p-2.5 z-10 bg-[#152232] border border-slate-700/60 shadow-xl"
         >
-          {/* Metallic Phone Bezel Edge Highlight */}
-          <div className="absolute inset-0 rounded-[42px] border border-white/20 pointer-events-none" />
-
           {/* Phone Screen Display */}
-          <div className="relative w-full h-full rounded-[34px] overflow-hidden bg-gradient-to-b from-[#E6F0FA] via-[#F4F9FD] to-[#E9DFD4] flex flex-col justify-between p-4">
+          <div className="relative w-full h-full rounded-[28px] overflow-hidden bg-slate-50 flex flex-col justify-between p-3.5 border border-slate-200/60">
             {/* Top Status Bar */}
-            <div className="flex items-center justify-between text-[11px] font-semibold text-[#193653]/70 px-2 pt-1 z-30">
-              <span>9:41</span>
+            <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 px-2 pt-1 z-30">
+              <span>09:41</span>
               {/* Dynamic Island / Notch */}
-              <div className="w-20 h-4 bg-[#0F1722] rounded-full mx-auto" />
-              <div className="flex items-center space-x-1">
-                <span>5G</span>
-                <div className="w-4 h-2 rounded-sm border border-[#193653]/60 p-[1px]">
-                  <div className="w-full h-full bg-[#193653] rounded-[1px]" />
-                </div>
+              <div className="w-16 h-3.5 bg-[#152232] rounded-full mx-auto" />
+              <div className="flex items-center space-x-1 text-[10px]">
+                <span>REC</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-teal-600" />
               </div>
             </div>
 
             {/* App Header inside phone */}
             <div className="flex items-center justify-between px-2 pt-2 z-30">
               <div className="flex items-center space-x-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse" />
-                <span className="text-xs font-bold text-[#193653] tracking-wide">DERMORA VISION</span>
+                <div className="w-2 h-2 rounded-full bg-teal-600" />
+                <span className="text-[11px] font-mono font-medium text-[#193653] tracking-tight">DERMORA TELEMETRY</span>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/70 backdrop-blur font-medium text-[#193653]">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700">
                 {scanStatus}
               </span>
             </div>
 
             {/* --- CAMERA SCANNING VIEWPORT --- */}
-            <div className="relative flex-1 my-2 rounded-2xl overflow-hidden flex items-center justify-center bg-gradient-to-b from-white/40 to-[#F0E5D8]/50 border border-white/60">
+            <div className="relative flex-1 my-2 rounded-xl overflow-hidden flex items-center justify-center bg-slate-100 border border-slate-200">
               {/* Soft skin surface base background in viewport */}
               <div
                 className="absolute inset-0 opacity-80"
@@ -160,7 +151,7 @@ export const PhoneScanner: React.FC<PhoneScannerProps> = ({
 
               {/* Cellular skin texture dots */}
               <div
-                className="absolute inset-0 opacity-20 pointer-events-none"
+                className="absolute inset-0 opacity-15 pointer-events-none"
                 style={{
                   backgroundImage: 'radial-gradient(#C88E72 1px, transparent 1px)',
                   backgroundSize: '16px 16px',
@@ -172,67 +163,49 @@ export const PhoneScanner: React.FC<PhoneScannerProps> = ({
                 <SkinCreature
                   variant="medium"
                   agitated={isScanning}
-                  glow={isScanning}
-                  showExclamation={!isScanning}
+                  glow={false}
+                  showExclamation={false}
                 />
               </div>
 
-              {/* --- CAMERA RETICLE / VIEWFINDER CORNERS --- */}
+              {/* --- CAMERA RETICLE / VIEWFINDER CORNERS (Exact Dermatoscope Look) --- */}
               <div className="absolute inset-4 pointer-events-none z-20">
                 {/* Top-left corner */}
-                <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-teal-500 rounded-tl-lg shadow-sm" />
+                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-teal-600 rounded-tl-sm" />
                 {/* Top-right corner */}
-                <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-teal-500 rounded-tr-lg shadow-sm" />
+                <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-teal-600 rounded-tr-sm" />
                 {/* Bottom-left corner */}
-                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-teal-500 rounded-bl-lg shadow-sm" />
+                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-teal-600 rounded-bl-sm" />
                 {/* Bottom-right corner */}
-                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-teal-500 rounded-br-lg shadow-sm" />
+                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-teal-600 rounded-br-sm" />
 
-                {/* Subtle center crosshairs */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 border border-teal-400/30 rounded-full flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 bg-teal-400 rounded-full" />
+                {/* Subtle center optical crosshair */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 border border-teal-600/40 rounded-full flex items-center justify-center">
+                  <div className="w-1 h-1 bg-teal-600 rounded-full" />
                 </div>
               </div>
 
-              {/* --- GLOWING VERTICAL SCANNING BEAM --- */}
+              {/* --- CALIBRATED SCANNING BEAM --- */}
               {isScanning && (
                 <motion.div
-                  className="absolute inset-x-2 h-10 z-30 pointer-events-none"
+                  className="absolute inset-x-2 h-0.5 z-30 pointer-events-none bg-teal-500"
                   animate={{
-                    top: ['5%', '85%', '5%'],
+                    top: ['8%', '88%', '8%'],
                   }}
                   transition={{
-                    duration: 1.8,
+                    duration: 1.6,
                     repeat: Infinity,
-                    ease: 'easeInOut',
+                    ease: 'linear',
                   }}
-                >
-                  {/* Laser line */}
-                  <div className="w-full h-1 bg-gradient-to-r from-transparent via-teal-300 to-transparent shadow-[0_0_15px_#2DD4BF]" />
-                  {/* Laser light gradient curtain */}
-                  <div className="w-full h-8 bg-gradient-to-b from-teal-400/25 to-transparent" />
-                </motion.div>
-              )}
-
-              {/* Scanning Particle sparkles */}
-              {isScanning && (
-                <motion.div
-                  className="absolute inset-0 z-30 pointer-events-none"
-                  animate={{ opacity: [0.4, 0.9, 0.4] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                >
-                  <div className="absolute top-1/4 left-1/3 w-1.5 h-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_#5EEAD4]" />
-                  <div className="absolute top-1/2 right-1/4 w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_8px_#67E8F9]" />
-                  <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_#6EE7B7]" />
-                </motion.div>
+                />
               )}
             </div>
 
             {/* Bottom Controls inside Phone */}
-            <div className="flex items-center justify-between px-3 py-2 z-30">
-              <div className="text-left">
-                <span className="block text-[10px] text-[#193653]/60 uppercase tracking-wider font-semibold">Mode</span>
-                <span className="text-xs font-bold text-[#193653]">HD Biometric</span>
+            <div className="flex items-center justify-between px-3 py-1.5 z-30">
+              <div className="text-left font-mono">
+                <span className="block text-[9px] text-slate-500 uppercase">Mode</span>
+                <span className="text-xs font-medium text-[#193653]">Dermatoscope</span>
               </div>
 
               {/* Big Shutter / Scan Button */}
@@ -240,49 +213,48 @@ export const PhoneScanner: React.FC<PhoneScannerProps> = ({
                 onClick={startScan}
                 disabled={isScanning}
                 aria-label="Trigger AI skin scan"
-                className="relative group p-1 rounded-full focus:outline-none transition-transform active:scale-95 cursor-pointer"
+                className="relative group p-1 rounded-full focus:outline-none cursor-pointer"
               >
-                {/* Outer ring */}
-                <div className="w-14 h-14 rounded-full border-2 border-white/80 shadow-md flex items-center justify-center bg-white/40 backdrop-blur">
+                <div className="w-12 h-12 rounded-full border border-slate-300 flex items-center justify-center bg-white shadow-sm">
                   {/* Circular progress bar SVG */}
                   <svg className="absolute inset-0 w-full h-full -rotate-90">
                     <circle
-                      cx="28"
-                      cy="28"
-                      r="24"
-                      stroke="#E2E8F0"
-                      strokeWidth="3"
+                      cx="24"
+                      cy="24"
+                      r="20"
+                      stroke="#F1F5F9"
+                      strokeWidth="2.5"
                       fill="none"
                     />
                     <circle
-                      cx="28"
-                      cy="28"
-                      r="24"
+                      cx="24"
+                      cy="24"
+                      r="20"
                       stroke="#0D9488"
-                      strokeWidth="3"
+                      strokeWidth="2.5"
                       fill="none"
-                      strokeDasharray="150"
-                      strokeDashoffset={150 - (150 * scanProgress) / 100}
+                      strokeDasharray="125"
+                      strokeDashoffset={125 - (125 * scanProgress) / 100}
                       strokeLinecap="round"
                     />
                   </svg>
 
                   {/* Core button */}
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-teal-500 to-cyan-400 shadow-md flex items-center justify-center group-hover:scale-105 transition-all">
+                  <div className="w-8 h-8 rounded-full bg-[#193653] text-white flex items-center justify-center">
                     {isScanning ? (
-                      <span className="text-[11px] font-black text-white">{scanProgress}%</span>
+                      <span className="text-[10px] font-mono font-medium">{scanProgress}%</span>
                     ) : scanFinished ? (
-                      <CheckCircle2 className="w-5 h-5 text-white" />
+                      <CheckCircle2 className="w-4 h-4 text-teal-400" />
                     ) : (
-                      <Scan className="w-5 h-5 text-white" />
+                      <Scan className="w-4 h-4" />
                     )}
                   </div>
                 </div>
               </button>
 
-              <div className="text-right">
-                <span className="block text-[10px] text-[#193653]/60 uppercase tracking-wider font-semibold">Zoom</span>
-                <span className="text-xs font-bold text-[#193653]">3.2x Macro</span>
+              <div className="text-right font-mono">
+                <span className="block text-[9px] text-slate-500 uppercase">Optics</span>
+                <span className="text-xs font-medium text-[#193653]">Macro 3.2x</span>
               </div>
             </div>
           </div>
@@ -290,27 +262,24 @@ export const PhoneScanner: React.FC<PhoneScannerProps> = ({
       </motion.div>
 
       {/* --- FLOATING "SCAN & ANALYSE" CALLOUT BADGE --- */}
-      <motion.div
-        className="absolute -right-8 top-1/3 z-30 cursor-pointer select-none"
-        whileHover={{ scale: 1.05, y: -2 }}
-        whileTap={{ scale: 0.96 }}
+      <div
+        className="absolute -right-6 top-1/3 z-30 cursor-pointer select-none"
         onClick={startScan}
       >
-        <div className="flex items-center space-x-2.5 px-4 py-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white shadow-xl">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#193653] to-[#2D537B] flex items-center justify-center text-white shadow-md">
-            <Scan className="w-4 h-4 text-teal-300 animate-pulse" />
+        <div className="flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200/90 shadow-md">
+          <div className="w-8 h-8 rounded-lg bg-[#193653] flex items-center justify-center text-white">
+            <Focus className="w-4 h-4 text-teal-400" />
           </div>
           <div className="text-left pr-1">
-            <div className="text-xs font-extrabold text-[#193653] flex items-center space-x-1">
-              <span>Scan & Analyse</span>
-              <Sparkles className="w-3 h-3 text-amber-500" />
+            <div className="text-xs font-medium text-[#193653]">
+              Vision analysis demo
             </div>
-            <div className="text-[10px] text-[#193653]/65 font-medium">
-              {isScanning ? 'Processing scan...' : 'Click to test AI engine'}
+            <div className="text-[10px] font-mono text-slate-500">
+              {isScanning ? 'Segmenting barrier...' : 'Click to run analysis'}
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import confetti from 'canvas-confetti';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/landing/Navbar';
 import { ScrollExperience } from '../components/landing/scenes/ScrollExperience';
 import { MindAndSkinSection } from '../components/landing/sections/MindAndSkinSection';
 import { MeetSolaceSection } from '../components/landing/sections/MeetSolaceSection';
 import { FinalCtaSection } from '../components/landing/sections/FinalCtaSection';
-import { Play, Sparkles, CheckCircle2, X } from 'lucide-react';
+import { Play, Activity, CheckCircle2, X } from 'lucide-react';
 import { MascotHero } from '../components/landing/characters/MascotHero';
 
 export function LandingPage() {
@@ -33,17 +32,11 @@ export function LandingPage() {
   }, []);
 
   const triggerJourneyStart = () => {
-    confetti({
-      particleCount: 65,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#3B82F6', '#5EEAD4', '#DAD9F5', '#8873B9'],
-    });
     setOnboardingOpen(true);
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#FAF8F4] text-[#193653] selection:bg-[#B8D0E4] selection:text-[#193653] overflow-x-hidden">
+    <div className="relative min-h-screen w-full bg-[#FAF8F4] text-[#193653] selection:bg-slate-200 selection:text-[#193653] overflow-x-hidden">
       {/* 1. Global Navigation Bar */}
       <Navbar
         onGetStartedClick={triggerJourneyStart}
@@ -71,44 +64,50 @@ export function LandingPage() {
       {videoModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="fixed inset-0 bg-[#193653]/60 backdrop-blur-md"
+            className="fixed inset-0 bg-[#193653]/40 backdrop-blur-sm"
             onClick={() => setVideoModalOpen(false)}
           />
-          <div className="relative w-full max-w-2xl bg-white rounded-3xl p-6 shadow-2xl border border-white z-10 text-left">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div className="relative w-full max-w-xl bg-white rounded-2xl p-6 shadow-xl border border-slate-200 z-10 text-left">
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                  <Play className="w-4 h-4 fill-current ml-0.5" />
+                <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-[#193653]">
+                  <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                 </div>
-                <h3 className="text-base font-extrabold text-[#193653]">The Dermora Story</h3>
+                <h3 className="text-sm font-medium text-[#193653]">Dermora overview</h3>
               </div>
               <button
                 onClick={() => setVideoModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
+                className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <div className="my-6 rounded-2xl bg-gradient-to-br from-[#DCEAF5] via-[#FAF8F4] to-[#F0E5D8] p-8 text-center flex flex-col items-center justify-center min-h-[260px] border border-white">
-              <MascotHero size={160} interactive={false} />
-              <p className="mt-4 text-sm font-bold text-[#193653]">
+            <div className="my-5 rounded-xl bg-slate-50 p-6 text-center flex flex-col items-center justify-center min-h-[220px] border border-slate-200">
+              <MascotHero size={140} interactive={false} />
+              <p className="mt-3 text-sm font-medium text-[#193653]">
                 "Every subtle change on your skin tells a story before it becomes a flare."
               </p>
-              <p className="text-xs text-[#193653]/70 max-w-md mt-1">
-                Dermora was created by dermatologists and creative technologists to replace frantic web searches with gentle, objective tracking and direct doctor collaboration.
+              <p className="text-xs text-slate-500 max-w-md mt-1 leading-relaxed">
+                Dermora pairs daily vision analysis with circadian markers to enable timely clinical collaboration.
               </p>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setVideoModalOpen(false)}
+                className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#193653] text-xs font-medium transition-colors"
+              >
+                Close
+              </button>
               <button
                 onClick={() => {
                   setVideoModalOpen(false);
                   triggerJourneyStart();
                 }}
-                className="px-6 py-2.5 rounded-full bg-[#193653] text-white text-xs font-bold hover:bg-[#234A70] transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-[#193653] text-white text-xs font-medium hover:bg-[#234A70] transition-colors cursor-pointer"
               >
-                Begin Your Scan Journey
+                Start assessment
               </button>
             </div>
           </div>
@@ -119,71 +118,72 @@ export function LandingPage() {
       {onboardingOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="fixed inset-0 bg-[#193653]/60 backdrop-blur-md"
+            className="fixed inset-0 bg-[#193653]/40 backdrop-blur-sm"
             onClick={() => setOnboardingOpen(false)}
           />
-          <div className="relative w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-white z-10 text-left">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div className="relative w-full max-w-md bg-white rounded-2xl p-6 shadow-xl border border-slate-200 z-10 text-left">
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
               <div className="flex items-center space-x-2">
-                <Sparkles className="w-5 h-5 text-teal-500" />
-                <h3 className="text-base font-extrabold text-[#193653]">Welcome to Dermora</h3>
+                <Activity className="w-4 h-4 text-teal-700" />
+                <h3 className="text-sm font-medium text-[#193653]">Clinical onboarding</h3>
               </div>
               <button
                 onClick={() => setOnboardingOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
+                className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <div className="py-6 space-y-4">
-              <p className="text-xs text-[#193653]/75 leading-relaxed">
-                Experience the interactive landing page demo:
+            <div className="py-4 space-y-3">
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Explore the clinical interactive workflow:
               </p>
-              <div className="space-y-2.5">
-                <div className="p-3 rounded-2xl bg-slate-50 flex items-start space-x-3">
-                  <CheckCircle2 className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+              <div className="space-y-2">
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start space-x-3">
+                  <CheckCircle2 className="w-4 h-4 text-teal-700 mt-0.5 flex-shrink-0" />
                   <div className="text-xs">
-                    <span className="font-bold text-[#193653]">1. Scroll through the 5 Scenes</span>
-                    <p className="text-slate-500 text-[11px]">Experience the continuous pinned story where creatures multiply, impact indicators emerge, and the vertical timeline updates.</p>
+                    <span className="font-medium text-[#193653]">1. Scroll progression</span>
+                    <p className="text-slate-500 text-[11px] leading-relaxed">Observe early barrier shifts, cell propagation, and systemic lifestyle markers.</p>
                   </div>
                 </div>
-                <div className="p-3 rounded-2xl bg-slate-50 flex items-start space-x-3">
-                  <CheckCircle2 className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start space-x-3">
+                  <CheckCircle2 className="w-4 h-4 text-teal-700 mt-0.5 flex-shrink-0" />
                   <div className="text-xs">
-                    <span className="font-bold text-[#193653]">2. Test Scene 4: "Scan & Analyse"</span>
-                    <p className="text-slate-500 text-[11px]">Click the interactive camera shutter or floating badge to trigger the live scanning beam and report modal.</p>
+                    <span className="font-medium text-[#193653]">2. Test vision scanner</span>
+                    <p className="text-slate-500 text-[11px] leading-relaxed">Trigger calibrated mobile macro capture to segment boundaries and inspect redness.</p>
                   </div>
                 </div>
-                <div className="p-3 rounded-2xl bg-slate-50 flex items-start space-x-3">
-                  <CheckCircle2 className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start space-x-3">
+                  <CheckCircle2 className="w-4 h-4 text-teal-700 mt-0.5 flex-shrink-0" />
                   <div className="text-xs">
-                    <span className="font-bold text-[#193653]">3. Chat with Solace</span>
-                    <p className="text-slate-500 text-[11px]">Ask questions about sleep, stress, and prepare a personalized clinical report.</p>
+                    <span className="font-medium text-[#193653]">3. Solace clinical dialogue</span>
+                    <p className="text-slate-500 text-[11px] leading-relaxed">Synthesize sleep and stress correlations into verified clinical reports.</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <button
-              onClick={() => {
-                setOnboardingOpen(false);
-                // Scroll into Scene 4 inside the pinned experience
-                const st = document.getElementById('hero');
-                if (st) {
-                  window.scrollTo({ top: 2600, behavior: 'smooth' });
-                }
-              }}
-              className="w-full py-3 rounded-full bg-[#193653] text-white text-xs font-bold hover:bg-[#234A70] transition-colors shadow-md cursor-pointer"
-            >
-              Jump to AI Scanner Demo →
-            </button>
-            <button
-              onClick={() => navigate('/register')}
-              className="w-full mt-2 py-3 rounded-full bg-white border border-[#193653]/20 text-[#193653] text-xs font-bold hover:bg-slate-50 transition-colors cursor-pointer"
-            >
-              Create your account & open the app →
-            </button>
+            <div className="pt-2 flex flex-col space-y-2">
+              <button
+                onClick={() => {
+                  setOnboardingOpen(false);
+                  const st = document.getElementById('hero');
+                  if (st) {
+                    window.scrollTo({ top: 2600, behavior: 'smooth' });
+                  }
+                }}
+                className="w-full py-2.5 rounded-lg bg-[#193653] text-white text-xs font-medium hover:bg-[#234A70] transition-colors shadow-xs cursor-pointer"
+              >
+                Jump to vision scanner demo
+              </button>
+              <button
+                onClick={() => navigate('/register')}
+                className="w-full py-2.5 rounded-lg bg-white border border-slate-200 text-[#193653] text-xs font-medium hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                Create account & sign in
+              </button>
+            </div>
           </div>
         </div>
       )}

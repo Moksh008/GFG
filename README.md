@@ -7,7 +7,8 @@ environmental intelligence.
 ```
 .
 ├── client/    React 19 + Vite + Tailwind v4 web app (landing page + signed-in app)
-└── backend/   FastAPI API, DINOv2 skin model, SQLite/NeonDB  → see backend/README.md
+└── backend/   FastAPI API, DINOv2 skin model, SQLite/NeonDB, report-registry smart contract
+               → see backend/README.md
 ```
 
 ## Run it locally
@@ -44,7 +45,8 @@ voice input and AI-written responses (see `backend/.env.example`).
 | `/scans` | Scan history, per-area severity chart, scan detail, questionnaire → consultation, compare, delete |
 | `/mind` | Mood journal, 30-day patterns, mood/stress charts, mind↔skin correlations |
 | `/solace` | Voice/text sessions with Solace, spoken replies, session summaries |
-| `/insights` | AI overview, correlations, environment, PDF report, appointments |
+| `/insights` | AI overview, correlations, environment, verifiable PDF report + on-chain status, appointments |
+| `/verify`, `/verify/:id` | **Public** — doctors check a report PDF is authentic (blockchain-anchored SHA-256) |
 
 ## Client structure
 

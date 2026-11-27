@@ -25,6 +25,33 @@ uvicorn app.main:app --reload --port 8000
 
 Tests: `python -m pytest -q`
 
+## Verifiable doctor reports (blockchain)
+
+Every PDF from `GET /reports/pdf` gets a random report ID (printed with a QR code) and its
+**SHA-256 fingerprint is anchored on-chain** by Dermora's issuer wallet via the
+`DermoraReportRegistry` contract (`contracts/`). Doctors verify at `/verify` in the web app — the
+browser hashes the file locally, so the PDF never leaves their device. **Only hashes go on-chain,
+never patient data.**
+
+| `WEB3_RPC_URL` | Behaviour |
+|---|---|
+| *(empty)* | Off — fingerprints stored in the DB only (verdict "Issued by Dermora") |
+| `local` | In-process dev chain, contract auto-deployed. Resets on API restart (reports are re-anchored automatically) |
+| `https://…` | Real network (e.g. Base Sepolia) — set up as below |
+
+Go live on Base Sepolia (testnet, free):
+```powershell
+python scripts/deploy_registry.py wallet    # creates the issuer wallet in .env (prints its address)
+# fund that address with Base Sepolia ETH: https://docs.base.org/base-chain/tools/network-faucets
+python scripts/deploy_registry.py balance
+python scripts/deploy_registry.py deploy    # deploys + writes WEB3_RPC_URL / REPORT_REGISTRY_ADDRESS to .env
+```
+Then restart the API; `/health` → `blockchain.network` shows "Base Sepolia" and transactions link to BaseScan.
+Set `PUBLIC_APP_URL` to your deployed web app URL so QR codes point at the right verify page.
+
+Endpoints: `GET /reports/issued` (patient's reports + on-chain status), public `GET /reports/verify?hash=`
+and `GET /reports/verify/{reportId}`. Contract changes: edit the `.sol`, run `python scripts/compile_contract.py`.
+
 ### Troubleshooting
 `ImportError: cannot import name 'ArgsKwargs' from 'pydantic_core._pydantic_core'` (or any error from a
 compiled package) means the venv's interpreter and its installed packages are from different Python
@@ -59,7 +86,7 @@ CIELAB colour segmentation — they are tracking estimates, not calibrated clini
 | Solace | `POST /voice/start-session` `/voice/process-audio` `/voice/session/{id}/message` `/voice/session/{id}/end` · `GET /voice/session/{id}` `/voice/sessions` `/voice/audio/...` · `WS /voice/live?token=` |
 | Aria | `GET/DELETE /chat/history` · `POST /chat` |
 | Analytics | `GET /analytics/dashboard` `/analytics/correlations` `/analytics/insights` `/analytics/trend` |
-| Reports | `GET /reports/summary` `/reports/pdf` |
+| Reports | `GET /reports/summary` `/reports/pdf` `/reports/issued` · public `GET /reports/verify?hash=` `/reports/verify/{id}` |
 | Environment | `GET /weather/current?lat=&lon=` (Open-Meteo — no key needed) |
 | Care | `/medicines` (+ `/toggle`, `/doses`) · `/care-plan` · `/doctors` · `/appointments` (+ `/cancel`) |
 

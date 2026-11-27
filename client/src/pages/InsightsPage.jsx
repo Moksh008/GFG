@@ -1,11 +1,12 @@
 import React from 'react';
 import { CalendarX, FileDown, Loader2, Sparkles } from 'lucide-react';
-import { careApi, insightsApi } from '../api';
+import { careApi, insightsApi, reportsApi } from '../api';
 import { AppShell } from '../components/layout/AppShell';
 import { ErrorBanner, Spinner } from '../components/ui/Feedback';
 import { buttonClass } from '../components/ui/classes';
 import { CorrelationCard } from '../components/mind/CorrelationCard';
 import { EnvironmentCard } from '../components/dashboard/EnvironmentCard';
+import { IssuedReports } from '../components/reports/IssuedReports';
 import { useAsync } from '../hooks/useAsync';
 import { useReportExport } from '../hooks/useReportExport';
 import { useToast } from '../hooks/useToast';
@@ -15,7 +16,7 @@ async function loadInsights() {
   const [insights, correlations, report, appointments] = await Promise.all([
     insightsApi.insights(),
     insightsApi.correlations(),
-    insightsApi.reportSummary(),
+    reportsApi.summary(),
     careApi.appointments()
   ]);
   return { insights, correlations, report, appointments };
@@ -50,13 +51,13 @@ function Appointments({ appointments, onCancel }) {
   );
 }
 
-function ReportPreview({ report, onExport, exporting }) {
+function ReportPreview({ report, onExport, exporting, exportCount }) {
   return (
     <div className="solid-card space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div>
           <h3 className="text-sm font-semibold">Doctor-ready report</h3>
-          <p className="text-[11px] text-[#8A9AA0]">Scans, medications, mood and correlations in one PDF</p>
+          <p className="text-[11px] text-[#8A9AA0]">Scans, medications, mood and correlations — tamper-evident and verifiable by your doctor</p>
         </div>
         <button type="button" onClick={onExport} disabled={exporting} className={buttonClass.primary}>
           {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />} Download PDF
@@ -75,6 +76,7 @@ function ReportPreview({ report, onExport, exporting }) {
           </div>
         ))}
       </div>
+      <IssuedReports refreshKey={exportCount} />
       <p className="text-[10px] text-[#8A9AA0]">{report.disclaimer}</p>
     </div>
   );
@@ -83,7 +85,7 @@ function ReportPreview({ report, onExport, exporting }) {
 export default function InsightsPage() {
   const showToast = useToast();
   const { data, error, loading, reload, setData } = useAsync(loadInsights, []);
-  const { exportReport, exporting } = useReportExport();
+  const { exportReport, exporting, exportCount } = useReportExport();
 
   const cancelAppointment = async (id) => {
     try {
@@ -129,7 +131,7 @@ export default function InsightsPage() {
 
           <div className="grid grid-cols-12 gap-2.5">
             <div className="col-span-12 lg:col-span-7">
-              <ReportPreview report={data.report} onExport={exportReport} exporting={exporting} />
+              <ReportPreview report={data.report} onExport={exportReport} exporting={exporting} exportCount={exportCount} />
             </div>
             <div className="col-span-12 lg:col-span-5">
               <Appointments appointments={data.appointments} onCancel={cancelAppointment} />

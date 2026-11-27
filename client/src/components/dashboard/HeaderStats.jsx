@@ -18,7 +18,7 @@ function Stat({ value, label, badge, badgeClass }) {
 export function HeaderStats({ scansCount, medsTaken, medsTotal, upcomingAppointments }) {
   const allTaken = medsTotal > 0 && medsTaken === medsTotal;
   return (
-    <div className="flex items-center gap-6 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-xs text-[#1F2A2E]">
+    <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-6 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-xs text-[#1F2A2E]">
       <Stat value={scansCount} label="Total scans" />
       <div className="w-px h-6 bg-slate-200" />
       <Stat

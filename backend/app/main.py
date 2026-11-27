@@ -11,9 +11,11 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.core.database import SessionLocal, init_db
+from app.blockchain.registry import registry
 from app.models.inference import classifier
-from app.routers import analytics, auth, care, chat, mood, reports, skin, voice, weather
+from app.routers import analytics, auth, care, chat, demo, mood, reports, skin, voice, weather
 from app.services.gemini import gemini
+from app.services.report_anchor import retry_unanchored
 from app.utils.seed import seed_demo_user, seed_reference_data
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -27,6 +29,13 @@ def _warm_model() -> None:
         pass  # error is recorded on the classifier and surfaced via /health
 
 
+def _start_chain() -> None:
+    registry.connect()  # errors are recorded on the registry and surfaced via /health
+    queued = retry_unanchored()
+    if queued:
+        log.info("Queued %d report(s) for on-chain anchoring", queued)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings.upload_path.mkdir(parents=True, exist_ok=True)
@@ -38,6 +47,7 @@ async def lifespan(app: FastAPI):
             seed_demo_user(db)
     # Load the 86M-param model in the background so startup is instant.
     threading.Thread(target=_warm_model, daemon=True).start()
+    threading.Thread(target=_start_chain, daemon=True).start()
     log.info("Database: %s", settings.resolved_database_url.split("@")[-1])
     if gemini.available:
         log.info("Gemini: enabled (models: %s; server TTS: %s; live voice: %s)", ", ".join(settings.gemini_model_chain),
@@ -62,13 +72,14 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Report-Id", "X-Report-Sha256", "Content-Disposition"],
 )
 
 # Skin images are stored under random UUID names.
 settings.upload_path.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=settings.upload_path), name="uploads")
 
-for r in (auth, skin, mood, voice, analytics, reports, weather, care, chat):
+for r in (auth, skin, mood, voice, analytics, reports, weather, care, chat, demo):
     app.include_router(r.router)
 
 
@@ -97,4 +108,5 @@ def health():
             "realtime": gemini.live_available,
         },
         "azureVision": bool(settings.azure_vision_key and settings.azure_vision_endpoint),
+        "blockchain": registry.status(),
     }

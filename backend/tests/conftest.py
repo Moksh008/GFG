@@ -17,6 +17,10 @@ os.environ.update({
     "AZURE_VISION_KEY": "",
     "SEED_DEMO_DATA": "true",
     "SECRET_KEY": "test-secret-key-that-is-long-enough-for-hs256",
+    "WEB3_RPC_URL": "local",  # in-process dev chain with the registry auto-deployed
+    "WEB3_PRIVATE_KEY": "",
+    "REPORT_REGISTRY_ADDRESS": "",
+    "PUBLIC_APP_URL": "http://dermora.test",
 })
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -53,7 +57,11 @@ def other_auth(client):
 def demo_auth(client):
     r = client.post("/auth/login", json={"email": "alex@dermora.ai", "password": "dermora-demo"})
     assert r.status_code == 200, r.text
-    return {"Authorization": f"Bearer {r.json()['access_token']}"}
+    headers = {"Authorization": f"Bearer {r.json()['access_token']}"}
+    # The demo account starts empty; fill it the same way the app's "Fill demo data" button does.
+    assert client.get("/demo/status", headers=headers).json()["hasData"] is False
+    assert client.post("/demo/seed", headers=headers).status_code == 201
+    return headers
 
 
 def lesion_jpeg(redness: int = 200, radius: int = 120, seed: int = 0) -> bytes:

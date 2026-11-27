@@ -130,7 +130,7 @@ def test_mood_and_correlations(client, auth):
 
 def test_demo_dashboard(client, demo_auth):
     d = client.get("/analytics/dashboard", headers=demo_auth).json()
-    assert d["scansCount"] == 3
+    assert d["scansCount"] == 5
     assert d["medsTotal"] == 3 and d["medsTakenToday"] == 2
     assert d["latestScan"]["severityScore"] == 24 and d["latestScan"]["severityChange"] == -28
     assert d["upcomingAppointments"] == 1
@@ -145,7 +145,7 @@ def test_demo_dashboard(client, demo_auth):
 
     ins = client.get("/analytics/insights", headers=demo_auth).json()
     assert ins["summary"] and ins["insights"]
-    assert len(client.get("/analytics/trend", headers=demo_auth).json()) == 3
+    assert len(client.get("/analytics/trend", headers=demo_auth).json()) == 5
 
 
 # ------------------------------------------------------------------ care
@@ -180,7 +180,8 @@ def test_appointments(client, auth, other_auth):
     assert a.status_code == 201 and a.json()["doctor"] == avail["name"]
     assert client.post("/appointments", headers=other_auth, json={"doctorId": avail["id"], "slot": slot}).status_code == 409
     assert client.post("/appointments", headers=auth, json={"doctorId": avail["id"], "slot": "Never"}).status_code == 409
-    assert client.post("/appointments", headers=auth, json={"doctorId": absent["id"], "slot": absent["slots"][0]}).status_code == 409
+    assert absent["slots"] == []
+    assert client.post("/appointments", headers=auth, json={"doctorId": absent["id"], "slot": avail["slots"][0]}).status_code == 409
     c = client.post(f"/appointments/{a.json()['id']}/cancel", headers=auth).json()
     assert c["status"] == "cancelled"
     # slot frees up after cancellation
@@ -240,7 +241,7 @@ def test_live_ws_requires_gemini(client, demo_auth):
 # ------------------------------------------------------------------ reports & weather
 def test_reports(client, demo_auth):
     s = client.get("/reports/summary", headers=demo_auth).json()
-    assert s["patient"]["name"] == "Alex Mercer" and len(s["scans"]) == 3 and s["medications"]
+    assert s["patient"]["name"] == "Alex Mercer" and len(s["scans"]) == 5 and s["medications"]
     r = client.get("/reports/pdf", headers=demo_auth)
     assert r.status_code == 200 and r.content.startswith(b"%PDF") and len(r.content) > 1500
 
@@ -261,3 +262,55 @@ def test_weather(client, demo_auth, monkeypatch):
 
 def test_weather_needs_location(client, auth):
     assert client.get("/weather/current", headers=auth).status_code == 422
+
+
+# ------------------------------------------------------------------ scheduling, demo data, daily report
+def test_doctor_slots_and_specialty(client, auth):
+    docs = client.get("/doctors", headers=auth).json()
+    avail = next(d for d in docs if d["status"] == "Available")
+    assert avail["slots"] and avail["nextAvailable"] == avail["slots"][0]
+    assert all(len(s) == 16 and s[10] == "T" for s in avail["slots"])
+    assert avail["slots"] == sorted(avail["slots"])
+    vit = client.get("/doctors", headers=auth, params={"specialty": "vitiligo"}).json()
+    assert vit and all("vitiligo" in (d["department"] + d["specialty"]).lower() for d in vit)
+    a = client.post("/appointments", headers=auth, json={"doctorId": avail["id"], "slot": avail["slots"][0],
+                                                          "type": "Video consultation", "notes": "Itchy patch"}).json()
+    assert a["startsAt"] == avail["slots"][0] and a["upcoming"] is True and a["notes"] == "Itchy patch"
+    # the booked slot disappears from the provider's availability
+    again = next(d for d in client.get("/doctors", headers=auth).json() if d["id"] == avail["id"])
+    assert avail["slots"][0] not in again["slots"]
+    client.post(f"/appointments/{a['id']}/cancel", headers=auth)
+
+
+def test_demo_seed_and_reset(client):
+    from tests.conftest import _auth
+    h = _auth(client, "demo-reset@example.com")
+    assert client.get("/demo/status", headers=h).json()["hasData"] is False
+    assert client.post("/demo/seed", headers=h).status_code == 201
+    assert client.post("/demo/seed", headers=h).status_code == 409
+    assert len(client.get("/skin/history", headers=h).json()) == 5
+    hist = client.get("/medicines/history", headers=h, params={"days": 14}).json()
+    assert len(hist["days"]) == 14 and len(hist["medicines"]) == 3
+    assert hist["days"][-1]["expected"] == 4 and hist["days"][-1]["taken"] == 3
+    apts = client.get("/appointments", headers=h).json()
+    assert [a["upcoming"] for a in apts] == [False, True]
+    assert client.delete("/demo/data", headers=h).json()["hasData"] is False
+    assert client.get("/skin/history", headers=h).json() == []
+    assert client.get("/medicines", headers=h).json()["medicines"] == []
+    assert client.get("/care-plan", headers=h).json()  # starter plan restored
+
+
+def test_daily_report(client, demo_auth):
+    r = client.get("/reports/daily", headers=demo_auth).json()
+    assert r["summary"] and r["patient"]["name"] == "Alex Mercer"
+    areas = {a["bodyArea"]: a for a in r["areas"]}
+    assert set(areas) == {"Right Forearm", "Left Neck"}
+    fa = areas["Right Forearm"]
+    assert fa["scanCount"] == 3 and fa["vsBaseline"]["severity"] == 24 - 68 and fa["vsPrevious"]["severity"] == 24 - 52
+    assert len(fa["timeline"]) == 3
+    assert r["medications"]["expected"] == 4 and r["medications"]["taken"] == 3
+    assert any("Desonide" in f for f in r["flags"])
+    assert r["mood"]  # demo data includes a check-in today
+    assert client.get("/reports/daily", headers=demo_auth, params={"date": "nope"}).status_code == 422
+    pdf = client.get("/reports/daily/pdf", headers=demo_auth)
+    assert pdf.status_code == 200 and pdf.content[:4] == b"%PDF" and pdf.headers["X-Report-Id"]

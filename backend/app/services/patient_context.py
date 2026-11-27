@@ -1,7 +1,7 @@
 """Aggregates a patient's current state; shared by Aria, reports and the dashboard."""
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.entities import Appointment, CareStep, DoseLog, ImprovementRecord, Medicine, MoodLog, SkinDiagnosis, User
 from app.services import skin_knowledge
 from app.services.mood_inference_service import mood_patterns
+from app.services.scheduling import format_slot, parse_slot
 from app.utils.timefmt import today_utc
 
 
@@ -41,9 +42,13 @@ def snapshot(db: Session, user: User) -> dict:
         select(MoodLog).where(MoodLog.user_id == user.id).order_by(MoodLog.logged_at.desc()).limit(30)
     ))
     steps = list(db.scalars(select(CareStep).where(CareStep.user_id == user.id, CareStep.completed.is_(False))))
-    apts = list(db.scalars(
-        select(Appointment).where(Appointment.user_id == user.id, Appointment.status == "confirmed")
-    ))
+    now = datetime.now()
+    apts = sorted(
+        (a for a in db.scalars(
+            select(Appointment).where(Appointment.user_id == user.id, Appointment.status == "confirmed")
+        ) if (parse_slot(a.slot) or now) >= now),  # upcoming only; legacy free-text slots count as upcoming
+        key=lambda a: parse_slot(a.slot) or datetime.max,
+    )
     latest_impr = db.scalars(
         select(ImprovementRecord).where(ImprovementRecord.user_id == user.id)
         .order_by(ImprovementRecord.created_at.desc()).limit(1)
@@ -90,5 +95,5 @@ def describe(snap: dict) -> str:
             f"frequent emotions {', '.join(mp['topEmotions']) or '-'}, triggers {', '.join(mp['topTriggers']) or '-'}"
         )
     for a in snap["appointments"][:2]:
-        lines.append(f"Upcoming appointment: {a.doctor_name}, {a.slot} ({a.type})")
+        lines.append(f"Upcoming appointment: {a.doctor_name}, {format_slot(a.slot)} ({a.type})")
     return "\n".join(lines)

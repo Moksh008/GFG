@@ -16,14 +16,14 @@ export function Modal({ isOpen, onClose, title, subtitle, icon: Icon, iconClass 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-md animate-in fade-in duration-200"
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`bg-white/95 backdrop-blur-2xl border border-white/70 rounded-[28px] ${WIDTHS[size]} w-full p-6 shadow-2xl relative text-[#1F2A2E] max-h-[92vh] overflow-y-auto`}
+        className={`bg-white/95 backdrop-blur-2xl border border-white/70 rounded-t-[24px] sm:rounded-[28px] ${WIDTHS[size]} w-full p-5 sm:p-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl relative text-[#1F2A2E] max-h-[90vh] sm:max-h-[92vh] overflow-y-auto overscroll-contain`}
       >
         <button
           type="button"
@@ -34,7 +34,7 @@ export function Modal({ isOpen, onClose, title, subtitle, icon: Icon, iconClass 
           <X className="w-4 h-4" />
         </button>
 
-        <div className="flex items-center justify-between gap-2 mb-4 pr-10">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pr-10">
           <div className="flex items-center gap-2">
             {Icon && (
               <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${iconClass}`}>

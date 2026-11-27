@@ -70,3 +70,58 @@ export function downloadBlob(blob, filename) {
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+/** Parse a booking slot ("YYYY-MM-DDTHH:MM", clinic wall-clock time). Returns null for legacy free text. */
+export function parseSlot(slot) {
+  if (!slot || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(slot)) return null;
+  return new Date(slot); // no zone suffix -> parsed as local time
+}
+
+export function slotTime(slot) {
+  const d = parseSlot(slot);
+  return d ? d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : slot;
+}
+
+export function slotDay(slot, { long = false } = {}) {
+  const d = parseSlot(slot);
+  if (!d) return slot;
+  const today = new Date();
+  const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+  if (d.toDateString() === today.toDateString()) return 'Today';
+  if (d.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+  return d.toLocaleDateString(undefined, { weekday: long ? 'long' : 'short', month: 'short', day: 'numeric' });
+}
+
+/** "Tomorrow · 2:30 PM" for structured slots; legacy text unchanged. */
+export function formatSlot(slot) {
+  return parseSlot(slot) ? `${slotDay(slot)} · ${slotTime(slot)}` : slot;
+}
+
+/** Date + time of a scan, e.g. "Nov 24, 9:41 AM". */
+export function dateTime(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+/** Whole days between an ISO timestamp and now (calendar-day based). */
+export function daysSince(iso, now = new Date()) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  const a = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  const b = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((b - a) / 86400000);
+}
+
+export function relativeDays(iso) {
+  const n = daysSince(iso);
+  if (n === null) return '';
+  if (n <= 0) return 'today';
+  if (n === 1) return 'yesterday';
+  return `${n} days ago`;
+}
+
+/** Local YYYY-MM-DD for a Date (used for daily report links). */
+export function isoDay(date = new Date()) {
+  const p = (n) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`;
+}

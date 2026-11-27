@@ -11,7 +11,7 @@ export function SolaceCard() {
   const last = sessions?.find((s) => s.status === 'ended' && s.summary);
 
   return (
-    <div className="h-[300px] rounded-[14px] p-4 flex flex-col justify-between text-white shadow-md border border-[#2F5452] bg-gradient-to-br from-[#0F3B3F] via-[#1F6A66] to-[#3F5F4A] relative overflow-hidden">
+    <div className="min-h-[280px] lg:h-[300px] rounded-[14px] p-4 flex flex-col justify-between text-white shadow-md border border-[#2F5452] bg-gradient-to-br from-[#0F3B3F] via-[#1F6A66] to-[#3F5F4A] relative overflow-hidden">
       <div className="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-[#B98CE8]/25 blur-2xl pointer-events-none" />
       <div className="relative">
         <div className="flex items-center gap-2">

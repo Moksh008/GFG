@@ -38,6 +38,18 @@ class Settings(BaseSettings):
     azure_vision_key: str | None = None
     azure_vision_endpoint: str | None = None
 
+    # --- Blockchain report verification ----------------------------------------
+    # WEB3_RPC_URL: "" = off (hashes kept in DB only) | "local" = in-process dev chain
+    #               (auto-deployed, resets on restart) | https://… = real network
+    web3_rpc_url: str = ""
+    web3_private_key: str = ""  # Dermora issuer wallet that pays gas to anchor reports
+    report_registry_address: str = ""  # deployed DermoraReportRegistry (scripts/deploy_registry.py)
+    web3_network_name: str = ""  # display name, e.g. "Base Sepolia"
+    web3_explorer_url: str = ""  # e.g. https://sepolia.basescan.org
+    web3_confirm_timeout_seconds: int = 120
+    # Public URL of the web app — printed (and QR-encoded) in PDFs for verification links.
+    public_app_url: str = "http://localhost:5173"
+
     # --- Weather: Open-Meteo (free, no API key required) ---------------------
     weather_cache_minutes: int = 10
 

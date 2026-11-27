@@ -47,7 +47,7 @@ export function MoodCheckInCard({ moodSummary, onLogMood }) {
   };
 
   return (
-    <div className="solid-card h-[300px] flex flex-col justify-between">
+    <div className="solid-card min-h-[280px] lg:h-[300px] flex flex-col justify-between">
       <div className="flex items-start justify-between pb-2 border-b border-slate-100">
         <div>
           <h3 className="text-sm font-semibold tracking-tight text-[#1F2A2E]">Mood Check-in</h3>

@@ -1,0 +1,224 @@
+{
+  "contractName": "DermoraReportRegistry",
+  "compiler": "solc 0.8.24",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "AlreadyAnchored",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotIssuer",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroHash",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "issuer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "allowed",
+          "type": "bool"
+        }
+      ],
+      "name": "IssuerUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "issuer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "timestamp",
+          "type": "uint64"
+        }
+      ],
+      "name": "ReportAnchored",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "anchor",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "isIssuer",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "issuer",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "allowed",
+          "type": "bool"
+        }
+      ],
+      "name": "setIssuer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalAnchored",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "reportHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "verify",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "anchored",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint64",
+          "name": "timestamp",
+          "type": "uint64"
+        },
+        {
+          "internalType": "address",
+          "name": "issuer",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b50600080546001600160a01b031916339081178255808252600160208190526040808420805460ff1916909217909155519091907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a36040516001815233907f2da8853a4b9cb460e0d55b3ebaf4233e43c285958527a4dc0b67aa4b71b91af89060200160405180910390a261050d806100ae6000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80638da5cb5b1161005b5780638da5cb5b14610156578063a212e36f14610181578063eecdf92714610198578063f2fde38b146101ab57600080fd5b8063495289be1461008257806375e3661614610097578063877b9a6714610123575b600080fd5b610095610090366004610460565b6101be565b005b6100ef6100a536600461049c565b60009081526002602090815260409182902082518084019093525467ffffffffffffffff8116808452600160401b9091046001600160a01b03169290910182905280151592909190565b60408051931515845267ffffffffffffffff90921660208401526001600160a01b0316908201526060015b60405180910390f35b6101466101313660046104b5565b60016020526000908152604090205460ff1681565b604051901515815260200161011a565b600054610169906001600160a01b031681565b6040516001600160a01b03909116815260200161011a565b61018a60035481565b60405190815260200161011a565b6100956101a636600461049c565b61026f565b6100956101b93660046104b5565b610397565b6000546001600160a01b031633146101e9576040516330cd747160e01b815260040160405180910390fd5b6001600160a01b0382166102105760405163d92e233d60e01b815260040160405180910390fd5b6001600160a01b038216600081815260016020908152604091829020805460ff191685151590811790915591519182527f2da8853a4b9cb460e0d55b3ebaf4233e43c285958527a4dc0b67aa4b71b91af8910160405180910390a25050565b3360009081526001602052604090205460ff1661029f576040516354ec506360e01b815260040160405180910390fd5b806102bd5760405163f1ae58d560e01b815260040160405180910390fd5b60008181526002602052604090205467ffffffffffffffff16156102fb576040516330d2381360e01b81526004810182905260240160405180910390fd5b60408051808201825267ffffffffffffffff428181168084523360208086018281526000898152600283528890209651875491516001600160a01b0316600160401b026001600160e01b03199092169616959095179490941790945560038054600101905593519384529284917f345bc38bce676f7cb54d191c4b0de1c8bc21885038bd7d8bfa04521e40e14d2a910160405180910390a35050565b6000546001600160a01b031633146103c2576040516330cd747160e01b815260040160405180910390fd5b6001600160a01b0381166103e95760405163d92e233d60e01b815260040160405180910390fd5b600080546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a3600080546001600160a01b0319166001600160a01b0392909216919091179055565b80356001600160a01b038116811461045b57600080fd5b919050565b6000806040838503121561047357600080fd5b61047c83610444565b91506020830135801515811461049157600080fd5b809150509250929050565b6000602082840312156104ae57600080fd5b5035919050565b6000602082840312156104c757600080fd5b6104d082610444565b939250505056fea2646970667358221220f8ecb6bf74dae7ebcb975cc3b6fdbebc3079f2020b94626138de3e10b4517fe164736f6c63430008180033"
+}

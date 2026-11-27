@@ -13,12 +13,11 @@ export function LandingPage() {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Handle /hero route on initial load and browser navigation
+  // Handle hero hash route on initial load and browser navigation
   useEffect(() => {
     const handleRoute = () => {
-      const path = window.location.pathname;
       const hash = window.location.hash;
-      if (path === '/hero' || hash === '#hero' || hash === '#scene-hero') {
+      if (hash === '#hero' || hash === '#scene-hero') {
         const heroElem = document.getElementById('hero');
         if (heroElem) {
           heroElem.scrollIntoView({ behavior: 'smooth' });

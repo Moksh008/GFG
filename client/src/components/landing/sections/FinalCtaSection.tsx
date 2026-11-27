@@ -43,10 +43,10 @@ export const FinalCtaSection: React.FC<FinalCtaSectionProps> = ({
             </button>
 
             <a
-              href="/hero"
+              href="/"
               onClick={(e) => {
                 e.preventDefault();
-                window.history.pushState({}, '', '/hero');
+                window.history.pushState({}, '', '/');
                 document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="px-5 py-3 rounded-lg bg-white hover:bg-slate-50 text-[#193653] text-xs sm:text-sm font-medium border border-slate-200 shadow-2xs transition-colors cursor-pointer"
@@ -99,7 +99,7 @@ export const FinalCtaSection: React.FC<FinalCtaSectionProps> = ({
           <div>
             <h4 className="text-xs font-mono font-medium uppercase tracking-wider text-slate-600 mb-2.5">Platform</h4>
             <ul className="space-y-1.5 text-xs text-slate-500">
-              <li><a href="/hero" onClick={(e) => { e.preventDefault(); window.history.pushState({}, '', '/hero'); document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-[#193653] transition-colors">Visual story</a></li>
+              <li><a href="/" onClick={(e) => { e.preventDefault(); window.history.pushState({}, '', '/'); document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-[#193653] transition-colors">Visual story</a></li>
               <li><a href="#scene-scan" className="hover:text-[#193653] transition-colors">Vision scan</a></li>
               <li><a href="#scene-doctor" className="hover:text-[#193653] transition-colors">Doctor review</a></li>
               <li><a href="#meet-solace" className="hover:text-[#193653] transition-colors">Solace assistant</a></li>

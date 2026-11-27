@@ -29,7 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   const navLinks = [
-    { label: 'Overview', href: '/hero', targetId: 'hero' },
+    { label: 'Overview', href: '/', targetId: 'hero' },
     { label: 'Progression', href: '#scene-multiplies', targetId: 'hero' },
     { label: 'Vision scanner', href: '#scene-scan', targetId: 'hero' },
     { label: 'Clinical correlation', href: '#mind-skin', targetId: 'mind-skin' },
@@ -41,8 +41,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     setActiveLink(link.label);
     setMobileMenuOpen(false);
 
-    if (link.href === '/hero' || link.targetId === 'hero') {
-      window.history.pushState({}, '', '/hero');
+    if (link.href === '/' || link.targetId === 'hero') {
+      window.history.pushState({}, '', '/');
       const target = document.getElementById('hero');
       if (target) {
         target.scrollIntoView({ behavior: 'smooth' });
@@ -68,10 +68,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       >
         {/* --- LEFT: LOGO & WORDMARK --- */}
         <a
-          href="/hero"
+          href="/"
           onClick={(e) => {
             e.preventDefault();
-            window.history.pushState({}, '', '/hero');
+            window.history.pushState({}, '', '/');
             document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
           }}
           className="flex items-center space-x-2.5 focus:outline-none"

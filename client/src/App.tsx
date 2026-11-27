@@ -20,7 +20,7 @@ export function App() {
           <Routes>
             {/* Marketing */}
             <Route path="/" element={<LandingPage />} />
-            <Route path="/hero" element={<LandingPage />} />
+            <Route path="/hero" element={<Navigate to="/" replace />} />
 
             {/* Auth */}
             <Route path="/login" element={<AuthPage mode="login" />} />
